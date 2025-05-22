@@ -27,7 +27,12 @@ class TicketController extends Controller
             'status' => 'required|string|in:open,closed,pending',
         ]);
 
-        Ticket::create($request->only(['title', 'description', 'status']));
+        Ticket::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status,
+            'user_id' => auth()->id(),  // Aqui associamos o usuário logado
+        ]);
 
         return redirect()->route('tickets.index')->with('success', 'Chamado criado com sucesso!');
     }
