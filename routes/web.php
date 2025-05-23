@@ -6,8 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
-// Página inicial - lista tickets
-Route::get('/', [TicketController::class, 'index'])->name('tickets.index');
+// Página inicial redireciona para login
+Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
 
 // Registro - páginas públicas
 Route::get('/register', [UserController::class, 'create'])->name('register');
