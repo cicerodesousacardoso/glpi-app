@@ -13,7 +13,8 @@ class DatabaseSeeder extends Seeder
 {
     $this->call([
         RolesTableSeeder::class,
-        // Outros seeders aqui...
+        AdminUserSeeder::class, // <-- Adicione esta linha
+    
     ]);
 }
 
