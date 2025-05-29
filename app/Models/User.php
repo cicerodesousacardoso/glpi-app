@@ -8,13 +8,13 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
     ];
 
     protected $hidden = [
@@ -27,15 +27,33 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // 👇 Relacionamento com a Role
-    public function role()
+    // Chamados criados pelo usuário (user_id)
+    public function chamadosCriados()
     {
-        return $this->belongsTo(Role::class);
+        return $this->hasMany(Chamado::class, 'user_id');
     }
 
-    // 👇 Relacionamento com Tickets
-    public function tickets()
+    // Chamados atribuídos ao técnico (tecnico_id)
+    public function chamadosRecebidos()
     {
-        return $this->hasMany(Ticket::class);
+        return $this->hasMany(Chamado::class, 'tecnico_id');
+    }
+
+    // Verifica se é administrador
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    // Verifica se é técnico
+    public function isTecnico()
+    {
+        return $this->role === 'tecnico';
+    }
+
+    // Verifica se é usuário comum
+    public function isUsuario()
+    {
+        return $this->role === 'user';
     }
 }
