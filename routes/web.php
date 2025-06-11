@@ -5,6 +5,8 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
+  // Rotas de admin
+use App\Http\Controllers\Admin\UserManagementController;
 
 // Página inicial redireciona para login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -41,4 +43,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/tickets/{id}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
     Route::put('/tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy'])->name('tickets.destroy');
+
+  
+
+    Route::middleware('can:admin-access')->prefix('admin')->group(function () {
+        Route::get('/users', [UserManagementController::class, 'index'])->name('admin.users.index');
+        Route::post('/users/{id}/promote-technician', [UserManagementController::class, 'promoteToTechnician'])->name('admin.users.promote-technician');
+        Route::post('/users/{id}/promote-admin', [UserManagementController::class, 'promoteToAdmin'])->name('admin.users.promote-admin');
+        Route::post('/users/{id}/demote', [UserManagementController::class, 'demote'])->name('admin.users.demote');
+    });
 });
