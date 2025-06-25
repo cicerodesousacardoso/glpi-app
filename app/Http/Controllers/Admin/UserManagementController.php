@@ -4,20 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class UserManagementController extends Controller
 {
     public function index()
     {
-        $users = User::all();
+        $users = User::with('role')->get();
         return view('admin.users.index', compact('users'));
     }
 
     public function promoteToTechnician($id)
     {
         $user = User::findOrFail($id);
-        $user->role = 'tecnico';
+        $tecnicoRoleId = Role::where('name', 'tecnico')->value('id');
+        $user->role_id = $tecnicoRoleId;
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', "Usuário {$user->name} promovido a técnico.");
@@ -26,7 +28,8 @@ class UserManagementController extends Controller
     public function promoteToAdmin($id)
     {
         $user = User::findOrFail($id);
-        $user->role = 'admin';
+        $adminRoleId = Role::where('name', 'admin')->value('id');
+        $user->role_id = $adminRoleId;
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', "Usuário {$user->name} promovido a admin.");
@@ -35,7 +38,8 @@ class UserManagementController extends Controller
     public function demote($id)
     {
         $user = User::findOrFail($id);
-        $user->role = 'user';
+        $userRoleId = Role::where('name', 'user')->value('id');
+        $user->role_id = $userRoleId;
         $user->save();
 
         return redirect()->route('admin.users.index')->with('success', "Permissões removidas do usuário {$user->name}.");

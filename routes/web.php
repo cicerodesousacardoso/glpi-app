@@ -9,18 +9,20 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManagementController;
 
 // Página inicial redireciona para login
-Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::get('/', function(){
+    return 'home';
+})->name('home');
 
 // Registro - páginas públicas
-Route::get('/register', [UserController::class, 'create'])->name('register');
-Route::post('/register', [UserController::class, 'store'])->name('register.store');
+Route::get('/register', [UserController::class, 'create'])->middleware('guest')->name('register');
+Route::post('/register', [UserController::class, 'store'])->middleware('guest')->name('register.store');
 
 // Login - rotas públicas
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->middleware('guest')->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->middleware('guest')->name('login.store');
 
 // Logout - rota protegida por POST
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
 
 // Rotas protegidas por autenticação
 Route::middleware('auth')->group(function () {

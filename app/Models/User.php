@@ -14,7 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role',
+        'role_id', // Agora usamos role_id!
     ];
 
     protected $hidden = [
@@ -27,33 +27,37 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Chamados criados pelo usuário (user_id)
+    // Relacionamento com o papel (role)
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    // Chamados criados pelo usuário
     public function chamadosCriados()
     {
         return $this->hasMany(Chamado::class, 'user_id');
     }
 
-    // Chamados atribuídos ao técnico (tecnico_id)
+    // Chamados atribuídos ao técnico
     public function chamadosRecebidos()
     {
         return $this->hasMany(Chamado::class, 'tecnico_id');
     }
 
     // Verifica se é administrador
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
+   public function isAdmin()
+{
+    return optional($this->role)->name === 'admin';
+}
 
-    // Verifica se é técnico
-    public function isTecnico()
-    {
-        return $this->role === 'tecnico';
-    }
+public function isTecnico()
+{
+    return optional($this->role)->name === 'tecnico';
+}
 
-    // Verifica se é usuário comum
-    public function isUsuario()
-    {
-        return $this->role === 'user';
-    }
+public function isUsuario()
+{
+    return optional($this->role)->name === 'user';
+}
 }

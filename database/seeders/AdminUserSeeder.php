@@ -14,13 +14,13 @@ class AdminUserSeeder extends Seeder
         // Pega o ID do papel 'admin' na tabela roles
         $adminRoleId = DB::table('roles')->where('name', 'admin')->value('id');
 
-        User::updateOrCreate(
-            ['email' => 'admin@glpi.com'],
-            [
-                'name' => 'Admin Master',
-                'password' => Hash::make('admin123'),
-                'role_id' => $adminRoleId,
-            ]
-        );
+User::updateOrCreate(
+    ['email' => 'admin@glpi.test'],
+    [
+        'name' => 'Admin Master',
+        'password' => Hash::make('admin123'),
+        'role_id' => $adminRoleId,
+    ]
+);
     }
 }
