@@ -9,9 +9,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserManagementController;
 
 // Página inicial redireciona para login
-Route::get('/', function(){
-    return 'home';
+// Página inicial redireciona para dashboard se logado, senão login
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('login');
 })->name('home');
+
 
 // Registro - páginas públicas
 Route::get('/register', [UserController::class, 'create'])->middleware('guest')->name('register');
@@ -45,8 +51,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/tickets/{id}/edit', [TicketController::class, 'edit'])->name('tickets.edit');
     Route::put('/tickets/{id}', [TicketController::class, 'update'])->name('tickets.update');
     Route::delete('/tickets/{id}', [TicketController::class, 'destroy'])->name('tickets.destroy');
-
-  
 
     Route::middleware('can:admin-access')->prefix('admin')->group(function () {
         Route::get('/users', [UserManagementController::class, 'index'])->name('admin.users.index');

@@ -29,7 +29,7 @@
 
             <!-- Page Content -->
             <main>
-                {{ $slot }}
+                {{ $slot ?? 'não achou slot' }}
             </main>
         </div>
     </body>
