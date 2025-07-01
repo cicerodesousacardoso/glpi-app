@@ -29,6 +29,7 @@
 
             <!-- Page Content -->
             <main>
+                @yield('content')
                 {{ $slot ?? 'não achou slot' }}
             </main>
         </div>
