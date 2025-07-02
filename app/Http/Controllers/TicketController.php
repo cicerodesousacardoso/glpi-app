@@ -9,7 +9,8 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $tickets = Ticket::orderBy('created_at', 'desc')->get();
+        $tickets = Ticket::where('user_id', auth()->id())->latest()->paginate(10);
+
         return view('tickets.index', compact('tickets'));
     }
 
@@ -20,18 +21,16 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
-        // Validação simples
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|string|in:open,closed,pending',
+            'description' => 'required|string',
         ]);
 
         Ticket::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => $request->status,
-            'user_id' => auth()->id(),  // Aqui associamos o usuário logado
+            'user_id' => auth()->id(),
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'status' => 'aberto',
         ]);
 
         return redirect()->route('tickets.index')->with('success', 'Chamado criado com sucesso!');
@@ -39,35 +38,10 @@ class TicketController extends Controller
 
     public function show($id)
     {
-        $ticket = Ticket::findOrFail($id);
+        $ticket = Ticket::where('user_id', auth()->id())->findOrFail($id);
+
         return view('tickets.show', compact('ticket'));
     }
 
-    public function edit($id)
-    {
-        $ticket = Ticket::findOrFail($id);
-        return view('tickets.edit', compact('ticket'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|string|in:open,closed,pending',
-        ]);
-
-        $ticket = Ticket::findOrFail($id);
-        $ticket->update($request->only(['title', 'description', 'status']));
-
-        return redirect()->route('tickets.index')->with('success', 'Chamado atualizado com sucesso!');
-    }
-
-    public function destroy($id)
-    {
-        $ticket = Ticket::findOrFail($id);
-        $ticket->delete();
-
-        return redirect()->route('tickets.index')->with('success', 'Chamado deletado com sucesso!');
-    }
+    // Implementar editar, update e destroy conforme sua necessidade
 }

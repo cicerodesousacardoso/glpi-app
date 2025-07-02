@@ -30,7 +30,7 @@
             <!-- Page Content -->
             <main>
                 @yield('content')
-                {{ $slot ?? 'não achou slot' }}
+                {{ $slot ?? '' }}
             </main>
         </div>
     </body>
