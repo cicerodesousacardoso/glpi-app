@@ -1,51 +1,24 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Lista de Chamados</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <h1>Chamados</h1>
+@extends('layouts.app')
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+@section('content')
+<div class="max-w-3xl mx-auto p-6 bg-white rounded shadow">
+    <h1 class="text-3xl font-bold mb-6">Meus Chamados</h1>
+
+    @if($tickets->count())
+        <ul>
+            @foreach($tickets as $ticket)
+                <li class="mb-4 border-b pb-2">
+                    <a href="{{ route('tickets.show', $ticket->id) }}" class="text-blue-600 hover:underline font-semibold">
+                        {{ $ticket->title }}
+                    </a>
+                    <p class="text-gray-600 text-sm">{{ Str::limit($ticket->description, 100) }}</p>
+                </li>
+            @endforeach
+        </ul>
+
+        {{ $tickets->links() }}
+    @else
+        <p>Você ainda não possui chamados.</p>
     @endif
-
-    <a href="{{ route('tickets.create') }}" class="btn btn-primary mb-3">Novo Chamado</a>
-
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Título</th>
-                <th>Status</th>
-                <th>Criado em</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse ($tickets as $ticket)
-                <tr>
-                    <td>{{ $ticket->id }}</td>
-                    <td>{{ $ticket->title }}</td>
-                    <td>{{ $ticket->status }}</td>
-                    <td>{{ $ticket->created_at->format('d/m/Y H:i') }}</td>
-                    <td>
-                        <a href="{{ route('tickets.show', $ticket->id) }}" class="btn btn-info btn-sm">Ver</a>
-                        <a href="{{ route('tickets.edit', $ticket->id) }}" class="btn btn-warning btn-sm">Editar</a>
-                        <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button onclick="return confirm('Confirma exclusão?')" class="btn btn-danger btn-sm">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr><td colspan="5">Nenhum chamado encontrado.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
 </div>
-</body>
-</html>
+@endsection

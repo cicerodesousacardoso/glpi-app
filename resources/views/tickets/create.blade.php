@@ -4,7 +4,7 @@
 <div class="max-w-3xl mx-auto p-6 bg-white rounded shadow">
     <h1 class="text-3xl font-bold mb-6">Abrir Novo Chamado</h1>
 
-    <form action="{{ route('tickets.store') }}" method="POST">
+    <form action="{{ route('tickets.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-4">
@@ -22,6 +22,15 @@
             <textarea id="description" name="description" rows="5" required
                 class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">{{ old('description') }}</textarea>
             @error('description')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="product_image" class="block font-semibold mb-1">Foto do Produto</label>
+            <input type="file" id="product_image" name="product_image" accept="image/*"
+                class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600">
+            @error('product_image')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
             @enderror
         </div>

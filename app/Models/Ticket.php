@@ -9,12 +9,13 @@ class Ticket extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'title',
-        'description',
-        'status', // exemplo: aberto, em andamento, fechado
+   protected $fillable = [
+    'title',
+    'description',
+    'user_id',
+    'product_image_path', // novo campo para imagem
     ];
+
 
     public function user()
     {
