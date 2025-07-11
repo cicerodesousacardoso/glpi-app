@@ -14,30 +14,34 @@ Route::get('/', function () {
         : redirect()->route('login');
 })->name('home');
 
-// Autenticação
+// Rotas para visitantes (guest)
 Route::middleware('guest')->group(function () {
     Route::get('/register', [UserController::class, 'create'])->name('register');
     Route::post('/register', [UserController::class, 'store'])->name('register.store');
+
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('login.store');
 });
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth')->name('logout');
+// Logout
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
 
 // Rotas protegidas por autenticação
 Route::middleware(['auth'])->group(function () {
 
-    // Dashboard
+    // Dashboard para todos usuários autenticados
     Route::get('/dashboard', function () {
         return view('dashboard');
-    })->middleware('verified')->name('dashboard');
+    })->name('dashboard');
 
-    // Perfil
+    // Perfil do usuário
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Chamados (tickets)
+    // Chamados (tickets) acessíveis para todos os usuários autenticados
     Route::prefix('tickets')->name('tickets.')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('index');
         Route::get('/create', [TicketController::class, 'create'])->name('create');
@@ -48,11 +52,17 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [TicketController::class, 'destroy'])->name('destroy');
     });
 
-    // Rotas de administração
-    Route::middleware('can:admin-access')->prefix('admin')->name('admin.')->group(function () {
+    // Rotas de administração — só para admins
+    Route::middleware('is_admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/users', [UserManagementController::class, 'index'])->name('users.index');
-        Route::post('/users/{id}/promote-technician', [UserManagementController::class, 'promoteToTechnician'])->name('users.promote-technician');
-        Route::post('/users/{id}/promote-admin', [UserManagementController::class, 'promoteToAdmin'])->name('users.promote-admin');
+
+        Route::post('/users/{id}/promote-technician', [UserManagementController::class, 'promoteToTechnician'])
+            ->name('users.promote-technician');
+
+        Route::post('/users/{id}/promote-admin', [UserManagementController::class, 'promoteToAdmin'])
+            ->name('users.promote-admin');
+
         Route::post('/users/{id}/demote', [UserManagementController::class, 'demote'])->name('users.demote');
     });
+
 });

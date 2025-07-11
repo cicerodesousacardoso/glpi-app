@@ -6,13 +6,12 @@ use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvid
 use Illuminate\Support\Facades\Gate;
 
 use App\Models\User;
-use App\Policies\UserPolicy;
-
 
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        User::class => UserPolicy::class,
+        // Seus policies aqui, ex:
+        // User::class => UserPolicy::class,
     ];
 
     public function boot()
@@ -20,7 +19,15 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Gate::define('admin-access', function (User $user) {
-            return $user->role_id == 1; // ou use $user->can('admin') se preferir
+            return $user->role_id == 1; // Admin
+        });
+
+        Gate::define('technician-access', function (User $user) {
+            return $user->role_id == 2; // Técnico (exemplo)
+        });
+
+        Gate::define('user-access', function (User $user) {
+            return $user->role_id == 3; // Usuário comum (exemplo)
         });
     }
 }

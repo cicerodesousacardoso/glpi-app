@@ -9,14 +9,16 @@ class Ticket extends Model
 {
     use HasFactory;
 
+    // Campos que podem ser preenchidos via mass assignment
     protected $fillable = [
         'title',
         'description',
-        'status',              // adicione o campo status (open, closed, pending)
+        'status',
         'user_id',
-        'product_image_path',  // campo para imagem
+        'product_image_path',
     ];
 
+    // Relacionamento: um chamado pertence a um usuário
     public function user()
     {
         return $this->belongsTo(User::class);

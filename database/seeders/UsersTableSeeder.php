@@ -12,7 +12,7 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         $roles = DB::table('roles')->pluck('id', 'name');
-        dd($roles);
+
         $users = [
             [
                 'name' => 'Administrador',
