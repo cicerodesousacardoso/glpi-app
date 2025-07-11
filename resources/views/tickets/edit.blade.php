@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Editar Chamado</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <h1>Editar Chamado #{{ $ticket->id }}</h1>
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <h2>Editar Chamado</h2>
 
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -18,32 +14,41 @@
         </div>
     @endif
 
-    <form action="{{ route('tickets.update', $ticket->id) }}" method="POST">
+    <form method="POST" action="{{ route('tickets.update', $ticket->id) }}" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
-        <div class="mb-3">
-            <label for="title" class="form-label">Título</label>
-            <input type="text" name="title" id="title" class="form-control" value="{{ old('title', $ticket->title) }}" required>
+        <div class="form-group">
+            <label for="title">Título</label>
+            <input type="text" name="title" class="form-control" value="{{ old('title', $ticket->title) }}" required>
         </div>
 
-        <div class="mb-3">
-            <label for="description" class="form-label">Descrição</label>
-            <textarea name="description" id="description" class="form-control">{{ old('description', $ticket->description) }}</textarea>
+        <div class="form-group mt-3">
+            <label for="description">Descrição</label>
+            <textarea name="description" class="form-control" rows="5" required>{{ old('description', $ticket->description) }}</textarea>
         </div>
 
-        <div class="mb-3">
-            <label for="status" class="form-label">Status</label>
-            <select name="status" id="status" class="form-control" required>
+        <div class="form-group mt-3">
+            <label for="status">Status</label>
+            <select name="status" class="form-control" required>
                 <option value="open" {{ old('status', $ticket->status) == 'open' ? 'selected' : '' }}>Aberto</option>
-                <option value="pending" {{ old('status', $ticket->status) == 'pending' ? 'selected' : '' }}>Pendente</option>
+                <option value="in_progress" {{ old('status', $ticket->status) == 'in_progress' ? 'selected' : '' }}>Em andamento</option>
                 <option value="closed" {{ old('status', $ticket->status) == 'closed' ? 'selected' : '' }}>Fechado</option>
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Atualizar</button>
-        <a href="{{ route('tickets.index') }}" class="btn btn-secondary">Cancelar</a>
+        <div class="form-group mt-3">
+            <label for="product_image">Imagem (opcional)</label>
+            <input type="file" name="product_image" class="form-control" accept="image/*">
+
+            @if($ticket->product_image_path)
+                <p class="mt-2">Imagem atual:</p>
+                <img src="{{ asset('storage/' . $ticket->product_image_path) }}" alt="Imagem atual" style="max-width: 200px; height: auto;">
+            @endif
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Atualizar Chamado</button>
+        <a href="{{ route('tickets.index') }}" class="btn btn-secondary mt-3">Cancelar</a>
     </form>
 </div>
-</body>
-</html>
+@endsection
