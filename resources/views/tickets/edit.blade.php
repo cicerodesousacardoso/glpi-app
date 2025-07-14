@@ -20,32 +20,36 @@
 
         <div>
             <label for="title" class="block text-sm font-medium text-gray-700">Título</label>
-            <input type="text" name="title" value="{{ old('title', $ticket->title) }}"
+            <input type="text" name="title" id="title" value="{{ old('title', $ticket->title) }}"
                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
                    required>
         </div>
 
         <div>
             <label for="description" class="block text-sm font-medium text-gray-700">Descrição</label>
-            <textarea name="description" rows="5" required
+            <textarea name="description" id="description" rows="5" required
                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">{{ old('description', $ticket->description) }}</textarea>
         </div>
 
-        @if(in_array(auth()->user()->role->name, ['admin', 'tecnico']))
-        <div>
-            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-            <select name="status"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="open" {{ old('status', $ticket->status) == 'open' ? 'selected' : '' }}>Aberto</option>
-                <option value="in_progress" {{ old('status', $ticket->status) == 'in_progress' ? 'selected' : '' }}>Em andamento</option>
-                <option value="closed" {{ old('status', $ticket->status) == 'closed' ? 'selected' : '' }}>Fechado</option>
-            </select>
-        </div>
+        @php
+            $roleName = optional(auth()->user()->role)->name;
+        @endphp
+
+        @if(in_array($roleName, ['admin', 'tecnico']))
+            <div>
+                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                <select name="status" id="status"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                    <option value="open" {{ old('status', $ticket->status) == 'open' ? 'selected' : '' }}>Aberto</option>
+                    <option value="in_progress" {{ old('status', $ticket->status) == 'in_progress' ? 'selected' : '' }}>Em andamento</option>
+                    <option value="closed" {{ old('status', $ticket->status) == 'closed' ? 'selected' : '' }}>Fechado</option>
+                </select>
+            </div>
         @endif
 
         <div>
             <label for="product_image" class="block text-sm font-medium text-gray-700">Imagem (opcional)</label>
-            <input type="file" name="product_image" accept="image/*"
+            <input type="file" name="product_image" id="product_image" accept="image/*"
                    class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
                           file:rounded-full file:border-0 file:text-sm file:font-semibold
                           file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
@@ -61,11 +65,11 @@
 
         <div class="flex gap-4">
             <button type="submit"
-                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                    class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">
                 Atualizar Chamado
             </button>
             <a href="{{ route('tickets.index') }}"
-               class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+               class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
                 Cancelar
             </a>
         </div>

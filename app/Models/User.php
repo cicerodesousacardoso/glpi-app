@@ -14,7 +14,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id', // Agora usamos role_id!
+        'role_id', // FK para tabela roles
     ];
 
     protected $hidden = [
@@ -27,37 +27,51 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    // Relacionamento com o papel (role)
+    /**
+     * Relacionamento: cada usuário pertence a um papel (role).
+     */
     public function role()
     {
         return $this->belongsTo(Role::class);
     }
 
-    // Chamados criados pelo usuário
+    /**
+     * Chamados criados pelo usuário (relacionamento com tickets).
+     */
     public function chamadosCriados()
     {
         return $this->hasMany(Chamado::class, 'user_id');
     }
 
-    // Chamados atribuídos ao técnico
+    /**
+     * Chamados atribuídos a um técnico (se for técnico).
+     */
     public function chamadosRecebidos()
     {
         return $this->hasMany(Chamado::class, 'tecnico_id');
     }
 
-    // Verifica se é administrador
-   public function isAdmin()
-{
-    return optional($this->role)->name === 'admin';
-}
+    /**
+     * Verifica se o usuário tem papel de administrador.
+     */
+    public function isAdmin(): bool
+    {
+        return optional($this->role)->name === 'admin';
+    }
 
-public function isTecnico()
-{
-    return optional($this->role)->name === 'tecnico';
-}
+    /**
+     * Verifica se o usuário tem papel de técnico.
+     */
+    public function isTecnico(): bool
+    {
+        return optional($this->role)->name === 'tecnico';
+    }
 
-public function isUsuario()
-{
-    return optional($this->role)->name === 'user';
-}
+    /**
+     * Verifica se o usuário é usuário comum.
+     */
+    public function isUsuario(): bool
+    {
+        return optional($this->role)->name === 'user';
+    }
 }

@@ -17,7 +17,11 @@
 
         <div>
             <strong class="block text-sm text-gray-600">Status:</strong>
-            <span class="inline-block px-3 py-1 text-sm rounded-full bg-blue-100 text-blue-800">
+            <span class="inline-block px-3 py-1 text-sm rounded-full
+                @if($ticket->status === 'open') bg-green-100 text-green-800
+                @elseif($ticket->status === 'in_progress') bg-yellow-100 text-yellow-800
+                @elseif($ticket->status === 'closed') bg-red-100 text-red-800
+                @else bg-gray-100 text-gray-800 @endif">
                 {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
             </span>
         </div>
@@ -27,11 +31,15 @@
             <p>{{ $ticket->created_at->format('d/m/Y H:i') }}</p>
         </div>
 
-        @if(in_array(auth()->user()->role->name, ['admin', 'tecnico']))
-        <div>
-            <strong class="block text-sm text-gray-600">Criado por:</strong>
-            <p>{{ $ticket->user->name }} ({{ $ticket->user->email }})</p>
-        </div>
+        @php
+            $userRole = optional(auth()->user()->role)->name;
+        @endphp
+
+        @if(in_array($userRole, ['admin', 'tecnico']))
+            <div>
+                <strong class="block text-sm text-gray-600">Criado por:</strong>
+                <p>{{ optional($ticket->user)->name }} ({{ optional($ticket->user)->email }})</p>
+            </div>
         @endif
 
         @if ($ticket->product_image_path)
@@ -47,9 +55,13 @@
         <a href="{{ route('tickets.index') }}" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded">
             Voltar
         </a>
-        <a href="{{ route('tickets.edit', $ticket->id) }}" class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
-            Editar
-        </a>
+
+        @if($userRole === 'admin' || $userRole === 'tecnico' || $ticket->user_id === auth()->id())
+            <a href="{{ route('tickets.edit', $ticket->id) }}"
+               class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white rounded">
+                Editar
+            </a>
+        @endif
     </div>
 </div>
 @endsection

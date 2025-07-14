@@ -10,9 +10,10 @@ class TicketController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
+        $user = auth()->user()->loadMissing('role');
+        $roleName = $user->role->name ?? null;
 
-        if (in_array($user->role->name, ['tecnico', 'admin'])) {
+        if (in_array($roleName, ['tecnico', 'admin'])) {
             $tickets = Ticket::orderBy('created_at', 'desc')->get();
         } else {
             $tickets = Ticket::where('user_id', $user->id)
@@ -30,15 +31,25 @@ class TicketController extends Controller
 
     public function store(Request $request)
     {
+        $user = auth()->user()->loadMissing('role');
+        $roleName = $user->role->name ?? null;
+
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'product_image' => 'nullable|image|max:2048',
+            'status' => 'nullable|string|in:open,in_progress,closed',
         ]);
 
         $data = $request->only(['title', 'description']);
-        $data['user_id'] = auth()->id();
-        $data['status'] = 'open';
+        $data['user_id'] = $user->id;
+
+        // Apenas admin pode definir status, os outros sempre começam como "open"
+        if ($roleName === 'admin' && $request->filled('status')) {
+            $data['status'] = $request->input('status');
+        } else {
+            $data['status'] = 'open';
+        }
 
         if ($request->hasFile('product_image')) {
             $data['product_image_path'] = $request->file('product_image')->store('product_images', 'public');
@@ -68,24 +79,35 @@ class TicketController extends Controller
     public function update(Request $request, $id)
     {
         $ticket = Ticket::findOrFail($id);
-        $user = auth()->user();
+        $user = auth()->user()->loadMissing('role');
+        $roleName = $user->role->name ?? null;
+
         $this->authorizeTicketAccess($ticket);
 
-        if (in_array($user->role->name, ['admin', 'tecnico'])) {
-            $request->validate([
-                'status' => 'required|string|in:open,in_progress,closed',
-                'product_image' => 'nullable|image|max:2048',
-            ]);
-            // Apenas atualiza status e imagem
-            $data = ['status' => $request->input('status')];
-        } else {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string',
-                'product_image' => 'nullable|image|max:2048',
-            ]);
-            // Usuário comum só atualiza título e descrição
-            $data = $request->only(['title', 'description']);
+        // Validações
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'nullable|string|in:open,in_progress,closed',
+            'product_image' => 'nullable|image|max:2048',
+        ]);
+
+        $data = [];
+
+        if (in_array($roleName, ['admin', 'tecnico'])) {
+            if ($request->filled('status')) {
+                $data['status'] = $request->input('status');
+            }
+        }
+
+        if ($roleName === 'admin' || $ticket->user_id === $user->id) {
+            if ($request->filled('title')) {
+                $data['title'] = $request->input('title');
+            }
+
+            if ($request->filled('description')) {
+                $data['description'] = $request->input('description');
+            }
         }
 
         if ($request->hasFile('product_image')) {
@@ -116,9 +138,10 @@ class TicketController extends Controller
 
     private function authorizeTicketAccess(Ticket $ticket)
     {
-        $user = auth()->user();
+        $user = auth()->user()->loadMissing('role');
+        $roleName = $user->role->name ?? null;
 
-        if (!in_array($user->role->name, ['admin', 'tecnico']) && $ticket->user_id !== $user->id) {
+        if (!in_array($roleName, ['admin', 'tecnico']) && $ticket->user_id !== $user->id) {
             abort(403, 'Acesso não autorizado.');
         }
     }

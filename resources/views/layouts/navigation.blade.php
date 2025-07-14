@@ -24,7 +24,11 @@
                         </x-nav-link>
                     @endcan
 
-                    @if(auth()->user()->role->name === 'tecnico' || auth()->user()->role->name === 'admin' || auth()->user()->role->name === 'user')
+                    @php
+                        $roleName = auth()->user()->role->name ?? '';
+                    @endphp
+
+                    @if(in_array($roleName, ['tecnico', 'admin', 'user']))
                         <x-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
                             {{ __('Chamados') }}
                         </x-nav-link>
@@ -98,7 +102,11 @@
                 </x-responsive-nav-link>
             @endcan
 
-            @if(auth()->user()->role->name === 'tecnico' || auth()->user()->role->name === 'admin' || auth()->user()->role->name === 'user')
+            @php
+                $roleName = auth()->user()->role->name ?? '';
+            @endphp
+
+            @if(in_array($roleName, ['tecnico', 'admin', 'user']))
                 <x-responsive-nav-link :href="route('tickets.index')" :active="request()->routeIs('tickets.*')">
                     {{ __('Chamados') }}
                 </x-responsive-nav-link>

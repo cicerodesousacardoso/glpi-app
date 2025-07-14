@@ -10,8 +10,8 @@
         </div>
     @endif
 
-    <a href="{{ route('tickets.create') }}" 
-       class="inline-block mb-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+    <a href="{{ route('tickets.create') }}"
+       class="inline-block mb-6 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
         + Novo Chamado
     </a>
 
@@ -34,35 +34,41 @@
                             </a>
                         </td>
                         <td class="px-4 py-3 border-b">
-                            <span class="inline-block px-3 py-1 rounded-full text-sm
-                                @if($ticket->status === 'open') bg-green-100 text-green-800
-                                @elseif($ticket->status === 'in_progress') bg-yellow-100 text-yellow-800
-                                @elseif($ticket->status === 'closed') bg-red-100 text-red-800
-                                @else bg-gray-100 text-gray-800 @endif">
+                            @php
+                                $statusClasses = [
+                                    'open' => 'bg-green-100 text-green-800',
+                                    'in_progress' => 'bg-yellow-100 text-yellow-800',
+                                    'closed' => 'bg-red-100 text-red-800',
+                                ];
+                                $statusClass = $statusClasses[$ticket->status] ?? 'bg-gray-100 text-gray-800';
+                            @endphp
+                            <span class="inline-block px-3 py-1 rounded-full text-sm {{ $statusClass }}">
                                 {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
                             </span>
                         </td>
                         <td class="px-4 py-3 border-b">{{ $ticket->created_at->format('d/m/Y H:i') }}</td>
                         <td class="px-4 py-3 border-b text-center space-x-2">
                             @php
-                                $userRole = auth()->user()->role->name;
-                                $canEdit = ($userRole === 'admin' || $userRole === 'tecnico' || $ticket->user_id === auth()->id());
+                                $user = auth()->user();
+                                $roleName = optional($user->role)->name;
+                                $canEdit = in_array($roleName, ['admin', 'tecnico']) || $ticket->user_id === $user->id;
+                                $canDelete = $ticket->user_id === $user->id || $roleName === 'admin';
                             @endphp
 
                             @if($canEdit)
                                 <a href="{{ route('tickets.edit', $ticket->id) }}"
-                                   class="inline-block px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm">
+                                   class="inline-block px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-sm transition">
                                     Editar
                                 </a>
                             @endif
 
-                            @if($ticket->user_id === auth()->id() || $userRole === 'admin')
+                            @if($canDelete)
                                 <form action="{{ route('tickets.destroy', $ticket->id) }}" method="POST" class="inline-block"
                                       onsubmit="return confirm('Tem certeza que deseja deletar este chamado?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" 
-                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm">
+                                    <button type="submit"
+                                            class="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm transition">
                                         Excluir
                                     </button>
                                 </form>
