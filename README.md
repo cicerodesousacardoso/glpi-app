@@ -28,11 +28,6 @@ Sistema de gestão de chamados interno desenvolvido em **Laravel 12**, inspirado
 
 ---
 
-## 📸 Capturas de Tela
-
-> ✨ *Adicione aqui prints das telas de login, dashboard, criação e visualização de chamados, etc.*
-
----
 
 ## 📦 Instalação Local
 
